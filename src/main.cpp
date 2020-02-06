@@ -1,13 +1,19 @@
-#include "virtualkeyboard.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
+
+#include "virtualkeyboard.h"
+#include "bluetoothrfcomm.h"
+
+#define RFCOMM_DEVICE_NUMBER 0
+#define BT_ADDRESS "00:00:00:00:00:00"
 
 int
 main()
 {
   clsKeymap lKeyMap;
   clsVirtualKeyboard lKeyboard(lKeyMap);
+  clsBluetoothRfComm lComm(RFCOMM_DEVICE_NUMBER);
 
   // Set-up a virtual keyboard
   if(lKeyboard.ConfigureDevice())
@@ -47,6 +53,18 @@ main()
   else
   {
     std::cerr << "Setting up the virtual keyboard failed" << std::endl;
+  }
+
+
+
+  if(lComm.ConfigureDevice(BT_ADDRESS))
+  {
+    std::cout << "succeeded!" << std::endl;
+
+  }
+  else
+  {
+    std::cerr << "Setting up bluetooth socket failed" << std::endl;
   }
 
   return 0;

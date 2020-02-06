@@ -25,7 +25,7 @@ public:
    * @brief ConfigureDevice
    * Configures a virtual keyboard that can be used to send keystrokes with.
    * @note Must be called before using any of the sendevent functions!
-   * @return true if configuring the virutal keyboard has succeeded
+   * @return true if configuring the virtual keyboard has succeeded
    */
   bool ConfigureDevice();
 
