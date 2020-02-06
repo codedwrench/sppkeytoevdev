@@ -7,9 +7,14 @@ set (CMAKE_CXX_STANDARD 20)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(EVDEV REQUIRED libevdev)
 pkg_search_module(BLUEZ REQUIRED bluez)
+pkg_search_module(GLIB REQUIRED glib-2.0)
+pkg_search_module(DBUS REQUIRED dbus-1)
+
 
 include_directories(${EVDEV_INCLUDE_DIRS}
                     ${BLUEZ_INCLUDE_DIRS}
+                    ${GLIB_INCLUDE_DIRS}
+                    ${DBUS_INCLUDE_DIRS}
                     src/
                     headers/)
 
@@ -26,4 +31,6 @@ add_executable(main
 
 target_link_libraries(main
                       ${EVDEV_LIBRARIES}
-                      ${BLUEZ_LIBRARIES})
+                      ${BLUEZ_LIBRARIES}
+                      ${GLIB_LIBRARIES}
+                      ${DBUS_LIBRARIES})

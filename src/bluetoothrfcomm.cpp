@@ -5,10 +5,9 @@
 #include <errno.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
+#include <glib.h>
 
 #include "bluetoothrfcomm.h"
-
-
 
 using namespace clsBluetoothRfCommNamespace;
 
@@ -48,34 +47,45 @@ bool
 clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
 {
   bool lReturn = false;
-  int lErrorCode, lSuccess;
-
-  mCtl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);
-  if(mCtl >= 0)
+  if(!mDeviceConfigured)
   {
-    struct rfcomm_dev_req lRequest;
-    memset(&lRequest, 0, sizeof (lRequest));
+    int lErrorCode, lSuccess;
 
-    lRequest.dev_id = mDeviceNumber;
-    str2ba(aBluetoothAddress.c_str(), &lRequest.dst);
-    lRequest.channel = 1;
-
-    lSuccess = ioctl(mCtl, RFCOMMCREATEDEV, &lRequest);
-    lErrorCode = errno;
-
-    if(lSuccess >= 0)
+    mCtl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);
+    if(mCtl >= 0)
     {
-      lReturn = true;
+      // Try to release any sockets
+      ReleaseDevice();
+
+      struct rfcomm_dev_req lRequest;
+      memset(&lRequest, 0, sizeof (lRequest));
+
+      lRequest.dev_id = mDeviceNumber;
+      str2ba(aBluetoothAddress.c_str(), &lRequest.dst);
+      lRequest.channel = 1;
+
+      lSuccess = ioctl(mCtl, RFCOMMCREATEDEV, &lRequest);
+      lErrorCode = errno;
+
+      if(lSuccess >= 0)
+      {
+        mDeviceConfigured = true;
+        lReturn = true;
+      }
+      else
+      {
+        std::cerr << "Cannot create device: " << lErrorCode << ": "
+                  << strerror(lErrorCode) << std::endl;
+      }
     }
     else
     {
-      std::cerr << "Cannot create device: " << lErrorCode << ": "
-                << strerror(lErrorCode) << std::endl;
+      std::cerr << "Cannot open RFCOMM control socket" << std::endl;
     }
   }
   else
   {
-    std::cerr << "Cannot open RFCOMM control socket" << std::endl;
+    lReturn = true;
   }
   return lReturn;
 }
@@ -83,7 +93,11 @@ clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
 void
 clsBluetoothRfComm::DeconfigureDevice()
 {
-  ReleaseDevice();
+  // Only deconfigure the device if it has been made by us.
+  if(mDeviceConfigured)
+  {
+    ReleaseDevice();
+  }
   close(mCtl);
 }
 
