@@ -1,5 +1,6 @@
 #ifndef KEYBOARD_DEFINES_H
 #define KEYBOARD_DEFINES_H
+#include <stdint.h>
 
 /* Copyright (c) 2020 [Rick de Bondt] - keyboard_defines.h
  *

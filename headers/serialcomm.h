@@ -7,6 +7,7 @@
  */
 
 #include <memory>
+#include <iostream>
 #include <libserialport.h>
 
 /**
