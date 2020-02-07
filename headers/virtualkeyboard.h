@@ -52,6 +52,8 @@ public:
   bool SendKeyEvent(int aKey, bool aState);
 
 private:
+  bool SendKey(int aKey, bool aState);
+
   clsKeymap& mKeyMap;
   struct libevdev *mDevice = nullptr;
   struct libevdev_uinput *mUserInputDevice = nullptr;

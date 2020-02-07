@@ -18,8 +18,8 @@
 // Namespace containing constants for this class
 namespace
 clsKeymapNamespace {
-  static const bool cPressed = true;
-  static const bool cNotPressed = false;
+static const bool cPressed = true;
+static const bool cNotPressed = false;
 } // clsKeymapNamespace
 
 /**
@@ -32,31 +32,56 @@ class
 clsKeymap
 {
 public:
-  clsKeymap();
+    clsKeymap();
 
-  /**
+    /**
      * @brief GetKeymap
      * This function returns the entire keymap as a constant map
      * @return The entire keymap
      */
-  const std::map<uint8_t, std::pair<int, bool>>& GetKeymap();
+    const std::map<uint8_t, std::pair<int, bool>>& GetKeymap();
 
+    /** @brief GetFnKeymap
+    * This function returns the entire FN keymap as a constant map
+    * @return The entire keymap
+    **/
+   const std::map<uint8_t, std::pair<int, bool>>& GetFnKeymap();
 
-  /**
+    /**
      * @brief ConvertKey
      * This function returns an input event code and pressed state based on
      * bt-keycode
      * @return pair with pressed state and input event code, if code is not
-     * found, will return the last element (KEY_SLASH).
+     * found, will return {0, false}.
      */
-  const std::pair<int, bool>& ConvertKey(uint8_t aKey);
+    const std::pair<int, bool> ConvertKey(uint8_t aKey);
+
+    /**
+     * @brief GetImmediateRelease
+     * This function gets wether keys should be held until the key is no longer
+     * held (release keycode is sent), or if it should release immediately.
+     */
+    bool GetImmediateRelease();
+
+    /**
+     * @brief SetFnKeyPressed
+     * This function allows you the set/reset the FN-key externally
+     * @param aFnKeyPressed - Whether the FN-key should be pressed or not
+     */
+    void SetFnKeyPressed(bool aFnKeyPressed);
 private:
 
-  const std::map<uint8_t, std::pair<int, bool>> InitKeymap();
+    const std::map<uint8_t, std::pair<int, bool>> InitKeymap();
+    const std::map<uint8_t, std::pair<int, bool>> InitFnKeymap();
 
-  // This keymap translates the bluetooth inputs to libevdev scancodes
-  const std::map<uint8_t, std::pair<int, bool>> mKeymap;
+    bool mFnKeyPressed = false;
 
+    // This keymap translates the bluetooth inputs to libevdev scancodes
+    const std::map<uint8_t, std::pair<int, bool>> mKeymap;
+
+    /* This keymap translates the bluetooth inputs to libevdev scancodes when fn
+     is pressed */
+    const std::map<uint8_t, std::pair<int, bool>> mFnKeymap;
 };
 #endif
 

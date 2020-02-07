@@ -46,7 +46,26 @@ main()
                     {
                         const std::pair<int,bool>& lKey =
                                 lKeyMap.ConvertKey(lBuffer[i]);
-                        lKeyboard.SendKeyEvent(lKey.first, lKey.second);
+
+                        // Only send a key out if it's an actual key
+                        if(lKey.first != 0 && lKey.first != KEY_BLUETOOTH)
+                        {
+                            lKeyboard.SendKeyEvent(lKey.first, lKey.second);
+                        }
+                        else if(lKey.first == KEY_BLUETOOTH)
+                        {
+                            // Kill the connection so the keyboard can sleep
+                            lSerialComm.DeconfigureDevice();
+
+                            /* Stop FN-key since the keyboard isn't going to do
+                            that itself anymore */
+                            lKeyMap.SetFnKeyPressed(false);
+
+                            std::this_thread::sleep_for(
+                                        std::chrono::seconds(60));
+
+                            lSerialComm.ConfigureDevice();
+                        }
                     }
                 }
             }
@@ -59,4 +78,3 @@ main()
 
     return 0;
 }
-

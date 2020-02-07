@@ -3,10 +3,27 @@
 using namespace clsKeymapNamespace;
 
 // Initialize keymap using initializer function
-clsKeymap::clsKeymap() : mKeymap(InitKeymap())
+clsKeymap::clsKeymap() : mKeymap(InitKeymap()), mFnKeymap(InitFnKeymap())
 {
 }
 
+
+const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitFnKeymap()
+{
+    std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVector =
+    {{cZero, {KEY_VOLUMEUP, cPressed}},
+     {cNine, {KEY_VOLUMEDOWN, cPressed}},
+     {cEight, {KEY_MUTE, cPressed}},
+     {cBackspace, {KEY_BLUETOOTH, cPressed}},
+     {cSemiColon, {KEY_PAGEUP, cPressed}},
+     {cApostrophe, {KEY_PAGEDOWN, cPressed}},
+     {cLeft, {KEY_HOME, cPressed}},
+     {cRight, {KEY_END, cPressed}},
+     {cFn + cKeyReleaseOffset, {KEY_FN, cNotPressed}}};
+
+    return std::map<uint8_t, std::pair<int, bool>>(lKeyVector.begin(),
+                                                   lKeyVector.end());
+}
 
 const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitKeymap()
 {
@@ -98,8 +115,54 @@ clsKeymap::GetKeymap()
   return mKeymap;
 }
 
-const std::pair<int, bool>&
-clsKeymap::ConvertKey(uint8_t aKey)
+const std::map<uint8_t, std::pair<int, bool>>&
+clsKeymap::GetFnKeymap()
 {
-  return mKeymap.find(aKey)->second;
+  return mFnKeymap;
 }
+
+/* If the fn key is pressed, all of the keys after it should be released right
+   after press (easiest way to keep the key from being pressed after
+   releasing fn before releasing the key) */
+bool clsKeymap::GetImmediateRelease()
+{
+    return mFnKeyPressed;
+}
+
+void clsKeymap::SetFnKeyPressed(bool aFnKeyPressed)
+{
+    mFnKeyPressed = aFnKeyPressed;
+}
+
+const std::pair<int, bool>
+clsKeymap::ConvertKey(uint8_t aKey)
+{    
+    std::pair<int,bool> lKey = {0, false};
+
+    if(!mFnKeyPressed)
+    {
+        const auto& lIterator = mKeymap.find(aKey);
+        if(lIterator != mKeymap.end())
+        {
+            lKey = lIterator->second;
+        }
+    }
+    else
+    {
+        const auto& lIterator = mFnKeymap.find(aKey);
+        if(lIterator != mFnKeymap.end())
+        {
+            lKey = lIterator->second;
+        }
+    }
+
+    if(lKey.first == KEY_FN)
+    {
+        mFnKeyPressed = lKey.second;
+    }
+
+    return lKey;
+}
+
+
+

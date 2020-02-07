@@ -44,6 +44,13 @@ clsVirtualKeyboard::ConfigureDevice()
                                    NULL);
       }
     }
+    for(auto& [lKey, lValue] : mKeyMap.GetFnKeymap())
+    {
+        libevdev_enable_event_code(mDevice,
+                                   EV_KEY,
+                                   lValue.first,
+                                   NULL);
+    }
 
     int lErrorNumber =
         libevdev_uinput_create_from_device(mDevice,
@@ -79,37 +86,50 @@ clsVirtualKeyboard::DeconfigureDevice()
   }
 }
 
+bool clsVirtualKeyboard::SendKey(int aKey, bool aState)
+{
+    bool lReturn = false;
+
+    if(mUserInputDevice != nullptr)
+    {
+        int lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
+                                                       EV_KEY,
+                                                       aKey,
+                                                       aState);
+
+        if(lErrorNumber == 0)
+        {
+            lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
+                                                       EV_SYN, SYN_REPORT,
+                                                       0);
+            if(lErrorNumber == 0)
+            {
+                lReturn = true;
+            }
+            else
+            {
+                std::cerr << "VKEYBOARD: Failure sending SYN_REPORT: " << -lErrorNumber << ": "
+                          << strerror(-lErrorNumber) << std::endl;
+            }
+        }
+        else
+        {
+            std::cerr << "VKEYBOARD: Failure sending event: " << -lErrorNumber << ": "
+                      << strerror(-lErrorNumber) << std::endl;
+        }
+    }
+    return lReturn;
+}
+
 bool
 clsVirtualKeyboard::SendKeyEvent(int aKey, bool aState)
 {
-  bool lReturn = false;
-  if(mUserInputDevice != nullptr)
-  {
-    int lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
-                                                   EV_KEY,
-                                                   aKey,
-                                                   aState);
+    bool lReturn = SendKey(aKey, aState);
 
-    if(lErrorNumber == 0)
+    if(mKeyMap.GetImmediateRelease())
     {
-      lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
-                                                 EV_SYN, SYN_REPORT,
-                                                 0);
-      if(lErrorNumber == 0)
-      {
-        lReturn = true;
-      }
-      else
-      {
-        std::cerr << "VKEYBOARD: Failure sending SYN_REPORT: " << -lErrorNumber << ": "
-                  << strerror(-lErrorNumber) << std::endl;
-      }
+        SendKey(aKey, clsKeymapNamespace::cNotPressed);
     }
-    else
-    {
-      std::cerr << "VKEYBOARD: Failure sending event: " << -lErrorNumber << ": "
-                << strerror(-lErrorNumber) << std::endl;
-    }
-  }
-  return lReturn;
+
+    return lReturn;
 }

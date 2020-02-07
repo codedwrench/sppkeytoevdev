@@ -29,7 +29,7 @@ static const uint8_t cRightAlt     = static_cast<uint8_t>(0x13);
 static const uint8_t cSpacebar     = static_cast<uint8_t>(0x5c);
 static const uint8_t cUp           = static_cast<uint8_t>(0x28);
 static const uint8_t cLeft         = static_cast<uint8_t>(0x5e);
-static const uint8_t cDown         = static_cast<uint8_t>(0x28);
+static const uint8_t cDown         = static_cast<uint8_t>(0x60);
 static const uint8_t cRight        = static_cast<uint8_t>(0x2f);
 
 // Number keys
@@ -42,7 +42,7 @@ static const uint8_t cSix          = static_cast<uint8_t>(0x36);
 static const uint8_t cSeven        = static_cast<uint8_t>(0x3d);
 static const uint8_t cEight        = static_cast<uint8_t>(0x3e);
 static const uint8_t cNine         = static_cast<uint8_t>(0x46);
-static const uint8_t cZero         = static_cast<uint8_t>(0x65);
+static const uint8_t cZero         = static_cast<uint8_t>(0x45);
 
 // Alphabetic keys
 static const uint8_t cA            = static_cast<uint8_t>(0x1c);
@@ -78,7 +78,7 @@ static const uint8_t cMinus        = static_cast<uint8_t>(0x4e);
 static const uint8_t cEqual        = static_cast<uint8_t>(0x55);
 static const uint8_t cLeftBrace    = static_cast<uint8_t>(0x54);
 static const uint8_t cRightBrace   = static_cast<uint8_t>(0x5b);
-static const uint8_t cBackSlash    = static_cast<uint8_t>(0x5c);
+static const uint8_t cBackSlash    = static_cast<uint8_t>(0x5d);
 static const uint8_t cSemiColon    = static_cast<uint8_t>(0x3d);
 static const uint8_t cApostrophe   = static_cast<uint8_t>(0x52);
 static const uint8_t cComma        = static_cast<uint8_t>(0x41);
