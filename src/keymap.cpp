@@ -74,7 +74,8 @@ const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitKeymap()
    {cSemiColon, {KEY_SEMICOLON, cPressed}},
    {cApostrophe, {KEY_APOSTROPHE, cPressed}},
    {cComma, {KEY_COMMA, cPressed}},
-   {cDot, {KEY_DOT, cPressed}}};
+   {cDot, {KEY_DOT, cPressed}},
+   {cSlash, {KEY_SLASH, cPressed}}};
 
 
   // Add release keys

@@ -47,7 +47,7 @@ public:
      * This function returns an input event code and pressed state based on
      * bt-keycode
      * @return pair with pressed state and input event code, if code is not
-     * found, will return the last element (KEY_DOT).
+     * found, will return the last element (KEY_SLASH).
      */
   const std::pair<int, bool>& ConvertKey(uint8_t aKey);
 private:

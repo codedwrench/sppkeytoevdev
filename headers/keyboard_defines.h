@@ -82,5 +82,6 @@ static const uint8_t cSemiColon    = static_cast<uint8_t>(0x3d);
 static const uint8_t cApostrophe   = static_cast<uint8_t>(0x52);
 static const uint8_t cComma        = static_cast<uint8_t>(0x41);
 static const uint8_t cDot          = static_cast<uint8_t>(0x49);
+static const uint8_t cSlash        = static_cast<uint8_t>(0x4a);
 
 #endif

@@ -7,7 +7,7 @@
 #include "serialcomm.h"
 
 #define RFCOMM_DEVICE_NUMBER 0
-#define BT_ADDRESS "00:00:00:00:00:00"
+#define BT_ADDRESS "00:0f:6f:00:36:bd"
 #define SERIAL_PORT "/dev/rfcomm0"
 
 int
