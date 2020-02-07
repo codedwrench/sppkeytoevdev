@@ -4,68 +4,59 @@
 
 #include "virtualkeyboard.h"
 #include "bluetoothrfcomm.h"
+#include "serialcomm.h"
 
 #define RFCOMM_DEVICE_NUMBER 0
 #define BT_ADDRESS "00:00:00:00:00:00"
+#define SERIAL_PORT "/dev/rfcomm0"
 
 int
 main()
 {
-  clsKeymap lKeyMap;
-  clsVirtualKeyboard lKeyboard(lKeyMap);
-  clsBluetoothRfComm lComm(RFCOMM_DEVICE_NUMBER);
+    clsKeymap lKeyMap;
+    clsBluetoothRfComm lBtComm(RFCOMM_DEVICE_NUMBER);
+    clsSerialComm lSerialComm(SERIAL_PORT);
+    clsVirtualKeyboard lKeyboard(lKeyMap);
 
-  // Set-up a virtual keyboard
-  if(lKeyboard.ConfigureDevice())
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_H, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_H, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_E, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_E, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_O, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_O, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_SPACE, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_SPACE, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_W, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_W, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_O, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_O, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_R, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_R, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_L, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_D, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_D, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_1, clsKeymapNamespace::cPressed);
-    lKeyboard.SendKeyEvent(KEY_1, clsKeymapNamespace::cNotPressed);
-    lKeyboard.SendKeyEvent(KEY_LEFTSHIFT, clsKeymapNamespace::cNotPressed);
-  }
-  else
-  {
-    std::cerr << "Setting up the virtual keyboard failed" << std::endl;
-  }
+    if(!lBtComm.ConfigureDevice(BT_ADDRESS))
+    {
+      std::cerr << "Setting up bluetooth socket failed" << std::endl;
+    }
 
+    if(!lSerialComm.ConfigureDevice())
+    {
+        std::cerr << "Setting up serial communication failed" << std::endl;
+    }
 
+    // Set-up a virtual keyboard
+    if(lKeyboard.ConfigureDevice())
+    {
+        unsigned int lByteCount = 0;
+        uint8_t lBuffer[100];
 
-  if(lComm.ConfigureDevice(BT_ADDRESS))
-  {
-    std::cout << "succeeded!" << std::endl;
+        // We're done with the setup, start looping!
+        while(true)
+        {
+            lByteCount = lSerialComm.ReadBytes(lBuffer, sizeof(lBuffer));
+            if(lByteCount > 0)
+            {
+                for(unsigned int i = 0; i < lByteCount; i++)
+                {
+                    if(lBuffer[i] != 0xff && lBuffer[i] != 0x00)
+                    {
+                        const std::pair<int,bool>& lKey =
+                                lKeyMap.ConvertKey(lBuffer[i]);
+                        lKeyboard.SendKeyEvent(lKey.first, lKey.second);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Setting up the virtual keyboard failed" << std::endl;
+    }
 
-  }
-  else
-  {
-    std::cerr << "Setting up bluetooth socket failed" << std::endl;
-  }
-
-  return 0;
+    return 0;
 }
+

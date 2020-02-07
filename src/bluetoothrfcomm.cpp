@@ -5,11 +5,8 @@
 #include <errno.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
-#include <glib.h>
 
 #include "bluetoothrfcomm.h"
-
-using namespace clsBluetoothRfCommNamespace;
 
 clsBluetoothRfComm::clsBluetoothRfComm(int aDeviceNumber) :
   mDeviceNumber(aDeviceNumber)
@@ -38,7 +35,7 @@ clsBluetoothRfComm::ReleaseDevice()
      because then it's already released */
   if (lSuccess < 0 && lErrorCode != ENODEV)
   {
-    std::cerr << "Cannot release device: " << lErrorCode << ": "
+    std::cerr << "RFCOMM: Cannot release device: " << lErrorCode << ": "
               << strerror(lErrorCode) << std::endl;
   }
 }
@@ -74,7 +71,7 @@ clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
       }
       else
       {
-        std::cerr << "Cannot create device: " << lErrorCode << ": "
+        std::cerr << "RFCOMM: Cannot create device: " << lErrorCode << ": "
                   << strerror(lErrorCode) << std::endl;
       }
     }

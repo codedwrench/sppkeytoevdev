@@ -9,6 +9,12 @@
 
 #include "keymap.h"
 
+/**
+ * @brief The clsVirtualKeyboard class
+ * The clsVirtualKeyboard class creates a virtual keyboard which can send key-
+ * events. Use this to send the keyboard codes from the bluetooth device to
+ * the machine.
+ */
 class clsVirtualKeyboard
 {
 public:
@@ -51,4 +57,4 @@ private:
   struct libevdev_uinput *mUserInputDevice = nullptr;
 };
 
-#endif // VIRTUALKEYBOARD_H
+#endif

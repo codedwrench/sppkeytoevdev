@@ -39,13 +39,23 @@ public:
      * This function returns the entire keymap as a constant map
      * @return The entire keymap
      */
-  const std::map<char, std::pair<int, bool>>& GetKeymap();
+  const std::map<uint8_t, std::pair<int, bool>>& GetKeymap();
+
+
+  /**
+     * @brief ConvertKey
+     * This function returns an input event code and pressed state based on
+     * bt-keycode
+     * @return pair with pressed state and input event code, if code is not
+     * found, will return the last element (KEY_DOT).
+     */
+  const std::pair<int, bool>& ConvertKey(uint8_t aKey);
 private:
 
-  const std::map<char, std::pair<int, bool>> InitKeymap();
+  const std::map<uint8_t, std::pair<int, bool>> InitKeymap();
 
   // This keymap translates the bluetooth inputs to libevdev scancodes
-  const std::map<char, std::pair<int, bool>> mKeymap;
+  const std::map<uint8_t, std::pair<int, bool>> mKeymap;
 
 };
 #endif

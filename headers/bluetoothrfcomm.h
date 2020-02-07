@@ -1,23 +1,16 @@
-#ifndef BLUETOOTHCOMM_H
-#define BLUETOOTHCOMM_H
+#ifndef BLUETOOTHRFCOMM_H
+#define BLUETOOTHRFCOMM_H
+
+/* Copyright (c) 2020 [Rick de Bondt] - bluetoothrfcomm.h
+ *
+ * This file contains functions to open a rfcomm connection so the bluetooth
+ * keyboard can communicate with our machine.
+ *
+ * */
+
 #include <vector>
 #include <iostream>
-#include <dbus/dbus.h>
 
-namespace clsBluetoothRfCommNamespace {
-  static std::vector<std::string> cRfCommState = {
-    "unknown",
-    "connected",
-    "clean",
-    "bound",
-    "listening",
-    "connecting",
-    "connecting",
-    "config",
-    "disconnecting",
-    "closed"
-  };
-}
 class clsBluetoothRfComm
 {
 public:
@@ -49,7 +42,6 @@ private:
   int mCtl = 0;
   int mDeviceNumber;
   bool mDeviceConfigured;
-  DBusConnection *mDbusConnection;
 };
 
 #endif // BLUETOOTHCOMM_H

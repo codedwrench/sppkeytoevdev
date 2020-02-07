@@ -52,7 +52,7 @@ clsVirtualKeyboard::ConfigureDevice()
 
     if(lErrorNumber != 0)
     {
-      std::cerr << "Could not create fake device: " << -lErrorNumber << ": "
+      std::cerr << "VKEYBOARD: Could not create fake device: " << -lErrorNumber << ": "
                 << strerror(-lErrorNumber) << std::endl;
     }
     else
@@ -101,13 +101,13 @@ clsVirtualKeyboard::SendKeyEvent(int aKey, bool aState)
       }
       else
       {
-        std::cerr << "Failure sending SYN_REPORT: " << -lErrorNumber << ": "
+        std::cerr << "VKEYBOARD: Failure sending SYN_REPORT: " << -lErrorNumber << ": "
                   << strerror(-lErrorNumber) << std::endl;
       }
     }
     else
     {
-      std::cerr << "Failure sending event: " << -lErrorNumber << ": "
+      std::cerr << "VKEYBOARD: Failure sending event: " << -lErrorNumber << ": "
                 << strerror(-lErrorNumber) << std::endl;
     }
   }

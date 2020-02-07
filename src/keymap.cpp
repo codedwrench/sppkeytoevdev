@@ -8,10 +8,9 @@ clsKeymap::clsKeymap() : mKeymap(InitKeymap())
 }
 
 
-const std::map<char, std::pair<int, bool>>
-clsKeymap::InitKeymap()
+const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitKeymap()
 {
-  std::vector<std::pair<char, std::pair<int,bool>>> lKeyVector =
+  std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVectorInitial =
   {{cEsc, {KEY_ESC, cPressed}},
    {cBackspace, {KEY_BACKSPACE, cPressed}},
    {cTab, {KEY_TAB, cPressed}},
@@ -77,19 +76,29 @@ clsKeymap::InitKeymap()
    {cComma, {KEY_COMMA, cPressed}},
    {cDot, {KEY_DOT, cPressed}}};
 
-  // Add all of the release keys to the map as well
-  for(auto& [lKey, lValue] : lKeyVector)
+
+  // Add release keys
+  // Copy the vector, since doing it in the same vector corrupts my data :(
+  std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVectorFull(lKeyVectorInitial);
+
+  for(auto const& [lKey, lValue] : lKeyVectorInitial)
   {
-    lKeyVector.push_back({lKey + cKeyReleaseOffset,
-                         {lValue.first, cNotPressed}});
+    lKeyVectorFull.push_back({lKey + cKeyReleaseOffset,
+                             {lValue.first, cNotPressed}});
   }
 
-  return std::map<char, std::pair<int, bool>>(lKeyVector.begin(),
-                                              lKeyVector.end());
+  return std::map<uint8_t, std::pair<int, bool>>(lKeyVectorFull.begin(),
+                                                 lKeyVectorFull.end());
 }
 
-const std::map<char, std::pair<int, bool>>&
+const std::map<uint8_t, std::pair<int, bool>>&
 clsKeymap::GetKeymap()
 {
   return mKeymap;
+}
+
+const std::pair<int, bool>&
+clsKeymap::ConvertKey(uint8_t aKey)
+{
+  return mKeymap.find(aKey)->second;
 }
