@@ -13,8 +13,6 @@
 
 
 /**
- * @brief The clsBluetoothRfComm class
- *
  * Will create the rfcomm socket /dev/rfcomm0 so a serial connection can be
  * opened to /dev/rfcomm0
  */
@@ -47,7 +45,7 @@ public:
   /**
    * Releases a device from rfcomm
    */
-  void ReleaseDevice();
+  void ReleaseDevice() const;
 
   /**
    * Deconfigures the RfComm device

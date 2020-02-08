@@ -5,8 +5,8 @@
 #include <fcntl.h>
 #include <cstring>
 
-#include "virtualkeyboard.h"
-#include "keymap.h"
+#include "../headers/virtualkeyboard.h"
+#include "../headers/keymap.h"
 
 clsVirtualKeyboard::clsVirtualKeyboard(clsKeymap& aKeyMap) : mKeyMap(aKeyMap)
 {
@@ -32,7 +32,7 @@ clsVirtualKeyboard::ConfigureDevice()
     libevdev_enable_event_type(mDevice, EV_KEY);
 
     // Enable events for every possible key
-    for(auto& [lKey, lValue] : mKeyMap.GetKeymap())
+    for(const auto& [lKey, lValue] : mKeyMap.GetKeymap())
     {
       /* Since every key is in the map twice to account for unpressed
        * states, only go through the pressed ones */
@@ -44,7 +44,7 @@ clsVirtualKeyboard::ConfigureDevice()
                                    nullptr);
       }
     }
-    for(auto& [lKey, lValue] : mKeyMap.GetFnKeymap())
+    for(const auto& [lKey, lValue] : mKeyMap.GetFnKeymap())
     {
       libevdev_enable_event_code(mDevice,
                                  EV_KEY,

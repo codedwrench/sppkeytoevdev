@@ -1,10 +1,20 @@
 #include <utility>
-
-#include "serialcomm.h"
 #include <iostream>
 
-// Maximum time it may take to read a key
-#define MAX_READ_TIME_MS 2
+#include "../headers/serialcomm.h"
+
+
+namespace clsSerialCommNamespace {
+  // Maximum time it may take to read a key
+  constexpr unsigned int cMaxReadTimeMs = 2;
+
+  constexpr unsigned int cBaudrate = 9600;
+  constexpr unsigned int cBits = 8;
+  constexpr unsigned int cStopBits = 1;
+
+}
+
+using namespace clsSerialCommNamespace;
 
 clsSerialComm::clsSerialComm(std::string aPortName) :
     mPortName(std::move(aPortName))
@@ -28,10 +38,10 @@ clsSerialComm::ConfigureDevice()
                   << std::endl;
 
         if(CheckError(sp_open(mPort, SP_MODE_READ_WRITE)) &&
-           CheckError(sp_set_baudrate(mPort, 9600)) &&
-           CheckError(sp_set_bits(mPort, 8)) &&
+           CheckError(sp_set_baudrate(mPort, cBaudrate)) &&
+           CheckError(sp_set_bits(mPort, cBits)) &&
            CheckError(sp_set_parity(mPort, SP_PARITY_NONE)) &&
-           CheckError(sp_set_stopbits(mPort, 1)) &&
+           CheckError(sp_set_stopbits(mPort, cStopBits)) &&
            CheckError(sp_set_flowcontrol(mPort, SP_FLOWCONTROL_NONE)))
         {
             lReturn = true;
@@ -45,6 +55,12 @@ clsSerialComm::DeconfigureDevice()
 {
     CheckError(sp_close(mPort));
     sp_free_port(mPort);
+}
+
+void
+clsSerialComm::FlushData() const
+{
+    sp_flush(mPort, SP_BUF_BOTH);
 }
 
 unsigned int
@@ -61,9 +77,9 @@ clsSerialComm::ReadBytes(uint8_t* aBuffer, size_t aBufferSize)
         }
 
         lResult = sp_blocking_read(mPort,
-                                      static_cast<void*>(aBuffer),
-                                      static_cast<size_t>(lBytesWaiting),
-                                      MAX_READ_TIME_MS);
+                                   static_cast<void*>(aBuffer),
+                                   static_cast<size_t>(lBytesWaiting),
+                                   cMaxReadTimeMs);
 
         // Print possible errors;
         if(!CheckError(lResult))
@@ -80,7 +96,7 @@ bool
 clsSerialComm::CheckError(enum sp_return aResult)
 {
     bool lReturn = false;
-    char *lErrorMessage;
+    char* lErrorMessage = nullptr;
 
     switch (aResult) {
     case SP_ERR_ARG:

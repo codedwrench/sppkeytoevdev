@@ -23,8 +23,6 @@ clsKeymapNamespace {
 } // clsKeymapNamespace
 
 /**
- * @brief The clsKeymap class
- *
  * The clsKeymap class contains a map with all of the bluetooth codes to
  * input-event-codes. It contains functions to return the appropriate eventcode
  * based on the bluetooth code.
@@ -36,8 +34,6 @@ public:
   clsKeymap();
 
   /**
-   * @brief GetKeymap
-   *
    * This function returns the entire keymap as a constant map
    * @return The entire keymap
    */
@@ -51,33 +47,28 @@ public:
   const std::map<uint8_t, std::pair<unsigned int, bool>>& GetFnKeymap();
 
   /**
-   * @brief ConvertKey
-   *
    * This function returns an input event code and pressed state based on
    * bt-keycode
    * @return pair with pressed state and input event code, if code is not
    * found, will return {0, false}.
    */
-  const std::pair<unsigned int, bool> ConvertKey(uint8_t aKey);
+  std::pair<unsigned int, bool> ConvertKey(uint8_t aKey);
 
   /**
-   * @brief GetImmediateRelease
    * This function gets wether keys should be held until the key is no longer
    * held (release keycode is sent), or if it should release immediately.
    */
-  bool GetImmediateRelease();
+  bool GetImmediateRelease() const;
 
   /**
-   * @brief SetFnKeyPressed
-   *
    * This function allows you the set/reset the FN-key externally
    * @param aFnKeyPressed - Whether the FN-key should be pressed or not
    */
   void SetFnKeyPressed(bool aFnKeyPressed);
 private:
 
-  const std::map<uint8_t, std::pair<unsigned int, bool>> InitKeymap();
-  const std::map<uint8_t, std::pair<unsigned int, bool>> InitFnKeymap();
+  static std::map<uint8_t, std::pair<unsigned int, bool>> InitKeymap();
+  static std::map<uint8_t, std::pair<unsigned int, bool>> InitFnKeymap();
 
   bool mFnKeyPressed = false;
 

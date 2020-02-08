@@ -20,10 +20,16 @@ clsBluetoothRfComm::~clsBluetoothRfComm()
 }
 
 void
-clsBluetoothRfComm::ReleaseDevice()
+clsBluetoothRfComm::ReleaseDevice() const
 {
-  struct rfcomm_dev_req lRequest = {0,0,0,0,0};
-  int lErrorCode, lSuccess;
+  struct rfcomm_dev_req lRequest = {0,
+                                    0,
+                                    {0,0,0,0,0,0},
+                                    {0,0,0,0,0,0},
+                                    0};
+
+  int lErrorCode = 0;
+  int lSuccess = 0;
 
   lRequest.dev_id = mDeviceNumber;
 
@@ -45,7 +51,8 @@ clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
   bool lReturn = false;
   if(!mDeviceConfigured)
   {
-    int lErrorCode, lSuccess;
+    int lErrorCode = 0;
+    int lSuccess = 0;
 
     mCtl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);
     if(mCtl >= 0)
@@ -53,7 +60,11 @@ clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
       // Try to release any sockets
       ReleaseDevice();
 
-      struct rfcomm_dev_req lRequest {0,0,0,0,0};
+      struct rfcomm_dev_req lRequest = {0,
+                                        0,
+                                        {0,0,0,0,0,0},
+                                        {0,0,0,0,0,0},
+                                        0};
 
       lRequest.dev_id = mDeviceNumber;
       str2ba(aBluetoothAddress.c_str(), &lRequest.dst);
@@ -92,6 +103,7 @@ clsBluetoothRfComm::DeconfigureDevice()
   if(mDeviceConfigured)
   {
     ReleaseDevice();
+    mDeviceConfigured = false;
   }
   close(mCtl);
 }

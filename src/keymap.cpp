@@ -1,4 +1,4 @@
-#include "keymap.h"
+#include "../headers/keymap.h"
 
 using namespace clsKeymapNamespace;
 
@@ -8,7 +8,7 @@ clsKeymap::clsKeymap() : mKeymap(InitKeymap()), mFnKeymap(InitFnKeymap())
 }
 
 
-const std::map<uint8_t, std::pair<unsigned int, bool>>
+std::map<uint8_t, std::pair<unsigned int, bool>>
 clsKeymap::InitFnKeymap()
 {
   std::vector<std::pair<uint8_t, std::pair<unsigned int,bool>>> lKeyVector =
@@ -26,7 +26,7 @@ clsKeymap::InitFnKeymap()
                                                           lKeyVector.end());
 }
 
-const std::map<uint8_t, std::pair<unsigned int, bool>>
+std::map<uint8_t, std::pair<unsigned int, bool>>
 clsKeymap::InitKeymap()
 {
   std::vector<
@@ -130,7 +130,7 @@ clsKeymap::GetFnKeymap()
 /* If the fn key is pressed, all of the keys after it should be released right
  *  after press (easiest way to keep the key from being pressed after
  *  releasing fn before releasing the key) */
-bool clsKeymap::GetImmediateRelease()
+bool clsKeymap::GetImmediateRelease() const
 {
   return mFnKeyPressed;
 }
@@ -140,7 +140,7 @@ void clsKeymap::SetFnKeyPressed(bool aFnKeyPressed)
   mFnKeyPressed = aFnKeyPressed;
 }
 
-const std::pair<unsigned int, bool> clsKeymap::ConvertKey(uint8_t aKey)
+std::pair<unsigned int, bool> clsKeymap::ConvertKey(uint8_t aKey)
 {    
   std::pair<unsigned int,bool> lKey = {0, false};
 

@@ -2,28 +2,31 @@
 #include <chrono>
 #include <thread>
 
-#include "virtualkeyboard.h"
-#include "bluetoothrfcomm.h"
-#include "serialcomm.h"
+#include "../headers/virtualkeyboard.h"
+#include "../headers/bluetoothrfcomm.h"
+#include "../headers/serialcomm.h"
 
-#define RFCOMM_DEVICE_NUMBER 0
-#define BT_ADDRESS "00:0f:6f:00:36:bd"
-#define SERIAL_PORT "/dev/rfcomm0"
-#define CYCLE_TIME_MS 12
+namespace MainConstants {
+  constexpr int16_t cRfCommDeviceNumber = 0;
+  constexpr auto cBtAddress = "00:0f:6f:00:36:bd";
+  constexpr auto cSerialPort = "/dev/rfcomm0";
+  constexpr std::chrono::milliseconds cCycleTimeMs = std::chrono::milliseconds(12);
+  constexpr unsigned int cSerialBufferSize = 100;
+}
+
+using namespace MainConstants;
 
 void
 HandleReconnect(clsSerialComm& aSerialComm, clsBluetoothRfComm& aBtComm)
 {
-  /* We add a little bit of sleep time so any characters still coming from the
-   * keyboard will cause this prompt to show a bunch of times */
-  std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_TIME_MS));
-
   std::cout << "Press 'y' to reconnect" << std::endl;
-  if(getchar() == 'y')
+  std::string lInput;
+  getline(std::cin, lInput);
+  if(lInput.back() == 'y')
   {
     std::cout << "Reconnecting keyboard!"
               << std::endl;
-    aBtComm.ConfigureDevice(BT_ADDRESS);
+    aBtComm.ConfigureDevice(cBtAddress);
     aSerialComm.ConfigureDevice();
   }
   else
@@ -36,11 +39,11 @@ int
 main()
 {
   clsKeymap lKeyMap;
-  clsBluetoothRfComm lBtComm(RFCOMM_DEVICE_NUMBER);
-  clsSerialComm lSerialComm(SERIAL_PORT);
+  clsBluetoothRfComm lBtComm(cRfCommDeviceNumber);
+  clsSerialComm lSerialComm(cSerialPort);
   clsVirtualKeyboard lKeyboard(lKeyMap);
 
-  if(!lBtComm.ConfigureDevice(BT_ADDRESS))
+  if(!lBtComm.ConfigureDevice(cBtAddress))
   {
     std::cerr << "Setting up bluetooth socket failed" << std::endl;
   }
@@ -54,13 +57,14 @@ main()
   if(lKeyboard.ConfigureDevice())
   {
     unsigned int lByteCount = 0;
-    std::array<uint8_t, 100> lBuffer = {};
+    std::array<uint8_t, cSerialBufferSize> lBuffer = {};
 
     /* Lets flush any buffers sent to the serial port after a small delay
      * otherwise the initial data sent by the BT-keyboard will press some
-     * random keys */
-    std::this_thread::sleep_for(
-          std::chrono::milliseconds(CYCLE_TIME_MS));
+     * random keys, it needs a ReadBytes to start sending data */
+    lByteCount = lSerialComm.ReadBytes(lBuffer.data(), sizeof(lBuffer));
+    std::this_thread::sleep_for(cCycleTimeMs);
+    lSerialComm.FlushData();
 
     // We're done with the setup, start looping!
     while(true)
@@ -70,6 +74,7 @@ main()
       {
         for(unsigned int lCount = 0; lCount < lByteCount; lCount++)
         {
+          // If there is valid data
           if(lBuffer.at(lCount) != 0xff && lBuffer.at(lCount) != 0x00)
           {
             const std::pair<int,bool>& lKey =
@@ -106,7 +111,7 @@ main()
        * reaction time takes less than 21.4 milliseconds, would be
        * unsuitable for gaming, but whoever uses this kind of keyboard
        * for that purpose anyway! */
-      std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_TIME_MS));
+      std::this_thread::sleep_for(cCycleTimeMs);
     }
   }
   else

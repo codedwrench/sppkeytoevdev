@@ -46,6 +46,11 @@ public:
     void DeconfigureDevice();
 
     /**
+     * Flushes data from both the input and output serial buffers.
+     */
+    void FlushData() const;
+
+    /**
      * Reads as many bytes from the serial port as possible.
      * @param aBuffer - Buffer to put the bytes into
      * @param aBufferSize - The size of the buffer
@@ -53,8 +58,9 @@ public:
      */
     unsigned int ReadBytes(uint8_t *aBuffer, size_t aBufferSize);
 
+
 private:
-    bool CheckError(enum sp_return aResult);
+    static bool CheckError(enum sp_return aResult);
 
     const std::string mPortName;
     struct sp_port* mPort = nullptr;
