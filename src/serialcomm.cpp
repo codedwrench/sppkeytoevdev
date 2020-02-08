@@ -1,8 +1,13 @@
+#include <utility>
+
 #include "serialcomm.h"
 #include <iostream>
 
-clsSerialComm::clsSerialComm(const std::string& aPortName) :
-    mPortName(aPortName)
+// Maximum time it may take to read a key
+#define MAX_READ_TIME_MS 2
+
+clsSerialComm::clsSerialComm(std::string aPortName) :
+    mPortName(std::move(aPortName))
 {
 
 }
@@ -45,20 +50,20 @@ clsSerialComm::DeconfigureDevice()
 unsigned int
 clsSerialComm::ReadBytes(uint8_t* aBuffer, size_t aBufferSize)
 {
-    sp_return lResult = static_cast<sp_return>(0);
+    auto lResult = static_cast<sp_return>(0);
     int lBytesWaiting = sp_input_waiting(mPort);
 
     if(lBytesWaiting > 0)
     {
         if(static_cast<size_t>(lBytesWaiting) > aBufferSize)
         {
-            lBytesWaiting = aBufferSize;
+            lBytesWaiting = static_cast<int>(aBufferSize);
         }
 
         lResult = sp_blocking_read(mPort,
                                       static_cast<void*>(aBuffer),
-                                      lBytesWaiting,
-                                      1);
+                                      static_cast<size_t>(lBytesWaiting),
+                                      MAX_READ_TIME_MS);
 
         // Print possible errors;
         if(!CheckError(lResult))

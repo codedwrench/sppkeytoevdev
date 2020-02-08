@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 
 #include "bluetoothrfcomm.h"
 
-clsBluetoothRfComm::clsBluetoothRfComm(int aDeviceNumber) :
+clsBluetoothRfComm::clsBluetoothRfComm(int16_t aDeviceNumber) :
   mDeviceNumber(aDeviceNumber)
 {
 
@@ -22,13 +22,12 @@ clsBluetoothRfComm::~clsBluetoothRfComm()
 void
 clsBluetoothRfComm::ReleaseDevice()
 {
-  struct rfcomm_dev_req lRequest;
+  struct rfcomm_dev_req lRequest = {0,0,0,0,0};
   int lErrorCode, lSuccess;
 
-  memset(&lRequest, 0, sizeof(lRequest));
   lRequest.dev_id = mDeviceNumber;
 
-  lSuccess = ioctl(mCtl, RFCOMMRELEASEDEV, &lRequest);
+  lSuccess = ioctl(mCtl, RFCOMMRELEASEDEV, &lRequest); // NOLINT
   lErrorCode = errno;
 
   /* Don't care if the device doesn't exist,
@@ -54,14 +53,13 @@ clsBluetoothRfComm::ConfigureDevice(const std::string& aBluetoothAddress)
       // Try to release any sockets
       ReleaseDevice();
 
-      struct rfcomm_dev_req lRequest;
-      memset(&lRequest, 0, sizeof (lRequest));
+      struct rfcomm_dev_req lRequest {0,0,0,0,0};
 
       lRequest.dev_id = mDeviceNumber;
       str2ba(aBluetoothAddress.c_str(), &lRequest.dst);
       lRequest.channel = 1;
 
-      lSuccess = ioctl(mCtl, RFCOMMCREATEDEV, &lRequest);
+      lSuccess = ioctl(mCtl, RFCOMMCREATEDEV, &lRequest); // NOLINT
       lErrorCode = errno;
 
       if(lSuccess >= 0)

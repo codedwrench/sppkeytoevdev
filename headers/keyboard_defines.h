@@ -1,11 +1,11 @@
 #ifndef KEYBOARD_DEFINES_H
 #define KEYBOARD_DEFINES_H
-#include <stdint.h>
+#include <cstdint>
 
 /* Copyright (c) 2020 [Rick de Bondt] - keyboard_defines.h
  *
  * This file contains the hex-codes the HP IPaq foldable BT-Keyboard sends.
- * It has a press and release code for every key, release is always 0x80 higher.
+ * It has a press and release code for every key, release is always 0x80 higher
  *
  * */
 
@@ -79,7 +79,7 @@ static const uint8_t cEqual        = static_cast<uint8_t>(0x55);
 static const uint8_t cLeftBrace    = static_cast<uint8_t>(0x54);
 static const uint8_t cRightBrace   = static_cast<uint8_t>(0x5b);
 static const uint8_t cBackSlash    = static_cast<uint8_t>(0x5d);
-static const uint8_t cSemiColon    = static_cast<uint8_t>(0x3d);
+static const uint8_t cSemiColon    = static_cast<uint8_t>(0x4c);
 static const uint8_t cApostrophe   = static_cast<uint8_t>(0x52);
 static const uint8_t cComma        = static_cast<uint8_t>(0x41);
 static const uint8_t cDot          = static_cast<uint8_t>(0x49);

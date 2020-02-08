@@ -11,14 +11,32 @@
 #include <vector>
 #include <iostream>
 
+
+/**
+ * @brief The clsBluetoothRfComm class
+ *
+ * Will create the rfcomm socket /dev/rfcomm0 so a serial connection can be
+ * opened to /dev/rfcomm0
+ */
 class clsBluetoothRfComm
 {
 public:
-  clsBluetoothRfComm(int aDeviceNumber);
+  /**
+   * This will create the rfcomm socket /dev/rfcomm0 so a serial connection can
+   * be opened to /dev/rfcomm0
+   * @param aDeviceNumber - The number of the device to bind to (usually 0)
+   */
+  clsBluetoothRfComm(int16_t aDeviceNumber);
+
+  // Do not allow copy or move assignments
+  clsBluetoothRfComm(const clsBluetoothRfComm&) = delete;
+  clsBluetoothRfComm operator=(const clsBluetoothRfComm&) = delete;
+  clsBluetoothRfComm(clsBluetoothRfComm&&) = delete;
+  clsBluetoothRfComm& operator=(clsBluetoothRfComm&&) = delete;
+
   ~clsBluetoothRfComm();
 
   /**
-   * @brief ConfigureDevice
    * Configures a serial socket for bluetooth serial communication
    * @param aBluetoothAddress - The bt address the socket needs to listen to
    * @note Must be called before using any of the other functions!
@@ -27,21 +45,19 @@ public:
   bool ConfigureDevice(const std::string& aBluetoothAddress);
 
   /**
-   * @brief ReleaseDevice
    * Releases a device from rfcomm
    */
   void ReleaseDevice();
 
   /**
-   * @brief DeconfigureDevice
    * Deconfigures the RfComm device
    */
   void DeconfigureDevice();
 
 private:
   int mCtl = 0;
-  int mDeviceNumber;
-  bool mDeviceConfigured;
+  int16_t mDeviceNumber = 0;
+  bool mDeviceConfigured = false;
 };
 
 #endif // BLUETOOTHCOMM_H

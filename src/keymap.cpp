@@ -8,26 +8,29 @@ clsKeymap::clsKeymap() : mKeymap(InitKeymap()), mFnKeymap(InitFnKeymap())
 }
 
 
-const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitFnKeymap()
+const std::map<uint8_t, std::pair<unsigned int, bool>>
+clsKeymap::InitFnKeymap()
 {
-    std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVector =
-    {{cZero, {KEY_VOLUMEUP, cPressed}},
-     {cNine, {KEY_VOLUMEDOWN, cPressed}},
-     {cEight, {KEY_MUTE, cPressed}},
-     {cBackspace, {KEY_BLUETOOTH, cPressed}},
-     {cSemiColon, {KEY_PAGEUP, cPressed}},
-     {cApostrophe, {KEY_PAGEDOWN, cPressed}},
-     {cLeft, {KEY_HOME, cPressed}},
-     {cRight, {KEY_END, cPressed}},
-     {cFn + cKeyReleaseOffset, {KEY_FN, cNotPressed}}};
+  std::vector<std::pair<uint8_t, std::pair<unsigned int,bool>>> lKeyVector =
+  {{cZero, {KEY_VOLUMEUP, cPressed}},
+   {cNine, {KEY_VOLUMEDOWN, cPressed}},
+   {cEight, {KEY_MUTE, cPressed}},
+   {cBackspace, {KEY_BLUETOOTH, cPressed}},
+   {cSemiColon, {KEY_PAGEUP, cPressed}},
+   {cApostrophe, {KEY_PAGEDOWN, cPressed}},
+   {cLeft, {KEY_HOME, cPressed}},
+   {cRight, {KEY_END, cPressed}},
+   {cFn + cKeyReleaseOffset, {KEY_FN, cNotPressed}}};
 
-    return std::map<uint8_t, std::pair<int, bool>>(lKeyVector.begin(),
-                                                   lKeyVector.end());
+  return std::map<uint8_t, std::pair<unsigned int, bool>>(lKeyVector.begin(),
+                                                          lKeyVector.end());
 }
 
-const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitKeymap()
+const std::map<uint8_t, std::pair<unsigned int, bool>>
+clsKeymap::InitKeymap()
 {
-  std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVectorInitial =
+  std::vector<
+      std::pair<uint8_t, std::pair<unsigned int,bool>>> lKeyVectorInitial =
   {{cEsc, {KEY_ESC, cPressed}},
    {cBackspace, {KEY_BACKSPACE, cPressed}},
    {cTab, {KEY_TAB, cPressed}},
@@ -97,71 +100,73 @@ const std::map<uint8_t, std::pair<int, bool>> clsKeymap::InitKeymap()
 
   // Add release keys
   // Copy the vector, since doing it in the same vector corrupts my data :(
-  std::vector<std::pair<uint8_t, std::pair<int,bool>>> lKeyVectorFull(lKeyVectorInitial);
+  std::vector<std::pair<uint8_t,
+      std::pair<unsigned int,
+      bool>>> lKeyVectorFull(lKeyVectorInitial);
 
   for(auto const& [lKey, lValue] : lKeyVectorInitial)
   {
     lKeyVectorFull.push_back({lKey + cKeyReleaseOffset,
-                             {lValue.first, cNotPressed}});
+                              {lValue.first, cNotPressed}});
   }
 
-  return std::map<uint8_t, std::pair<int, bool>>(lKeyVectorFull.begin(),
-                                                 lKeyVectorFull.end());
+  return std::map<uint8_t,
+      std::pair<unsigned int, bool>>(lKeyVectorFull.begin(),
+                                     lKeyVectorFull.end());
 }
 
-const std::map<uint8_t, std::pair<int, bool>>&
+const std::map<uint8_t, std::pair<unsigned int, bool>>&
 clsKeymap::GetKeymap()
 {
   return mKeymap;
 }
 
-const std::map<uint8_t, std::pair<int, bool>>&
+const std::map<uint8_t, std::pair<unsigned int, bool>>&
 clsKeymap::GetFnKeymap()
 {
   return mFnKeymap;
 }
 
 /* If the fn key is pressed, all of the keys after it should be released right
-   after press (easiest way to keep the key from being pressed after
-   releasing fn before releasing the key) */
+ *  after press (easiest way to keep the key from being pressed after
+ *  releasing fn before releasing the key) */
 bool clsKeymap::GetImmediateRelease()
 {
-    return mFnKeyPressed;
+  return mFnKeyPressed;
 }
 
 void clsKeymap::SetFnKeyPressed(bool aFnKeyPressed)
 {
-    mFnKeyPressed = aFnKeyPressed;
+  mFnKeyPressed = aFnKeyPressed;
 }
 
-const std::pair<int, bool>
-clsKeymap::ConvertKey(uint8_t aKey)
+const std::pair<unsigned int, bool> clsKeymap::ConvertKey(uint8_t aKey)
 {    
-    std::pair<int,bool> lKey = {0, false};
+  std::pair<unsigned int,bool> lKey = {0, false};
 
-    if(!mFnKeyPressed)
+  if(!mFnKeyPressed)
+  {
+    const auto& lIterator = mKeymap.find(aKey);
+    if(lIterator != mKeymap.end())
     {
-        const auto& lIterator = mKeymap.find(aKey);
-        if(lIterator != mKeymap.end())
-        {
-            lKey = lIterator->second;
-        }
+      lKey = lIterator->second;
     }
-    else
+  }
+  else
+  {
+    const auto& lIterator = mFnKeymap.find(aKey);
+    if(lIterator != mFnKeymap.end())
     {
-        const auto& lIterator = mFnKeymap.find(aKey);
-        if(lIterator != mFnKeymap.end())
-        {
-            lKey = lIterator->second;
-        }
+      lKey = lIterator->second;
     }
+  }
 
-    if(lKey.first == KEY_FN)
-    {
-        mFnKeyPressed = lKey.second;
-    }
+  if(lKey.first == KEY_FN)
+  {
+    mFnKeyPressed = lKey.second;
+  }
 
-    return lKey;
+  return lKey;
 }
 
 

@@ -1,3 +1,5 @@
 *.txt.user
 *.txt.user.*
-build/
+build*/
+docs/html/
+docs/latex/

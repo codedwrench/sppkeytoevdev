@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
+#include <cstring>
 
 #include "virtualkeyboard.h"
 #include "keymap.h"
@@ -35,21 +35,21 @@ clsVirtualKeyboard::ConfigureDevice()
     for(auto& [lKey, lValue] : mKeyMap.GetKeymap())
     {
       /* Since every key is in the map twice to account for unpressed
-               states, only go through the pressed ones */
+       * states, only go through the pressed ones */
       if(lValue.second == clsKeymapNamespace::cPressed)
       {
         libevdev_enable_event_code(mDevice,
                                    EV_KEY,
-                                   lValue.first,
-                                   NULL);
+                                   static_cast<unsigned int>(lValue.first),
+                                   nullptr);
       }
     }
     for(auto& [lKey, lValue] : mKeyMap.GetFnKeymap())
     {
-        libevdev_enable_event_code(mDevice,
-                                   EV_KEY,
-                                   lValue.first,
-                                   NULL);
+      libevdev_enable_event_code(mDevice,
+                                 EV_KEY,
+                                 static_cast<unsigned int>(lValue.first),
+                                 nullptr);
     }
 
     int lErrorNumber =
@@ -59,8 +59,8 @@ clsVirtualKeyboard::ConfigureDevice()
 
     if(lErrorNumber != 0)
     {
-      std::cerr << "VKEYBOARD: Could not create fake device: " << -lErrorNumber << ": "
-                << strerror(-lErrorNumber) << std::endl;
+      std::cerr << "VKEYBOARD: Could not create fake device: " << -lErrorNumber
+                << ": " << strerror(-lErrorNumber) << std::endl;
     }
     else
     {
@@ -88,48 +88,48 @@ clsVirtualKeyboard::DeconfigureDevice()
 
 bool clsVirtualKeyboard::SendKey(int aKey, bool aState)
 {
-    bool lReturn = false;
+  bool lReturn = false;
 
-    if(mUserInputDevice != nullptr)
+  if(mUserInputDevice != nullptr)
+  {
+    int lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
+                                                   EV_KEY,
+                                                   aKey,
+                                                   aState);
+
+    if(lErrorNumber == 0)
     {
-        int lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
-                                                       EV_KEY,
-                                                       aKey,
-                                                       aState);
-
-        if(lErrorNumber == 0)
-        {
-            lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
-                                                       EV_SYN, SYN_REPORT,
-                                                       0);
-            if(lErrorNumber == 0)
-            {
-                lReturn = true;
-            }
-            else
-            {
-                std::cerr << "VKEYBOARD: Failure sending SYN_REPORT: " << -lErrorNumber << ": "
-                          << strerror(-lErrorNumber) << std::endl;
-            }
-        }
-        else
-        {
-            std::cerr << "VKEYBOARD: Failure sending event: " << -lErrorNumber << ": "
-                      << strerror(-lErrorNumber) << std::endl;
-        }
+      lErrorNumber = libevdev_uinput_write_event(mUserInputDevice,
+                                                 EV_SYN, SYN_REPORT,
+                                                 0);
+      if(lErrorNumber == 0)
+      {
+        lReturn = true;
+      }
+      else
+      {
+        std::cerr << "VKEYBOARD: Failure sending SYN_REPORT: " << -lErrorNumber
+                  << ": " << strerror(-lErrorNumber) << std::endl;
+      }
     }
-    return lReturn;
+    else
+    {
+      std::cerr << "VKEYBOARD: Failure sending event: " << -lErrorNumber
+                << ": " << strerror(-lErrorNumber) << std::endl;
+    }
+  }
+  return lReturn;
 }
 
 bool
 clsVirtualKeyboard::SendKeyEvent(int aKey, bool aState)
 {
-    bool lReturn = SendKey(aKey, aState);
+  bool lReturn = SendKey(aKey, aState);
 
-    if(mKeyMap.GetImmediateRelease())
-    {
-        SendKey(aKey, clsKeymapNamespace::cNotPressed);
-    }
+  if(mKeyMap.GetImmediateRelease())
+  {
+    SendKey(aKey, clsKeymapNamespace::cNotPressed);
+  }
 
-    return lReturn;
+  return lReturn;
 }
