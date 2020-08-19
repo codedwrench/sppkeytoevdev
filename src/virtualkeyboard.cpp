@@ -32,23 +32,23 @@ clsVirtualKeyboard::ConfigureDevice()
     libevdev_enable_event_type(mDevice, EV_KEY);
 
     // Enable events for every possible key
-    for(const auto& [lKey, lValue] : mKeyMap.GetKeymap())
+    for(const auto& lMyPair : mKeyMap.GetKeymap())
     {
       /* Since every key is in the map twice to account for unpressed
        * states, only go through the pressed ones */
-      if(lValue.second == clsKeymapNamespace::cPressed)
+      if(lMyPair.second.second == clsKeymapNamespace::cPressed)
       {
         libevdev_enable_event_code(mDevice,
                                    EV_KEY,
-                                   static_cast<unsigned int>(lValue.first),
+                                   static_cast<unsigned int>(lMyPair.second.first),
                                    nullptr);
       }
     }
-    for(const auto& [lKey, lValue] : mKeyMap.GetFnKeymap())
+    for(const auto& lMyPair : mKeyMap.GetFnKeymap())
     {
       libevdev_enable_event_code(mDevice,
                                  EV_KEY,
-                                 static_cast<unsigned int>(lValue.first),
+                                 static_cast<unsigned int>(lMyPair.second.first),
                                  nullptr);
     }
 

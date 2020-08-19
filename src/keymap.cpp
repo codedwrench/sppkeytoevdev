@@ -104,10 +104,10 @@ clsKeymap::InitKeymap()
       std::pair<unsigned int,
       bool>>> lKeyVectorFull(lKeyVectorInitial);
 
-  for(auto const& [lKey, lValue] : lKeyVectorInitial)
+  for(auto const& lMyPair : lKeyVectorInitial)
   {
-    lKeyVectorFull.push_back({lKey + cKeyReleaseOffset,
-                              {lValue.first, cNotPressed}});
+    lKeyVectorFull.push_back({lMyPair.first + cKeyReleaseOffset,
+                              {lMyPair.second.first, cNotPressed}});
   }
 
   return std::map<uint8_t,

@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.06)
 
 project(scankeyb VERSION 1.0)
 
-set (CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 11)
 
 option(BUILD_DOC "Build doxygen" ON)
 
